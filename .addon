@@ -22,8 +22,8 @@
     "PhysicsMaxs": "1,1,1",
     "RenderMins": "-1,-1,-1",
     "RenderMaxs": "-1,-1,-1",
-    "Summary": "",
+    "Summary": "A simple \u0022enhancer\u0022 for the Block Party.",
     "Description": "",
-    "Public": false
+    "Public": true
   }
 }

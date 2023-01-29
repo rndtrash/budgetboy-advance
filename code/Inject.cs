@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Sandbox;
+using Sandbox.Diagnostics;
 
 namespace BBA;
 
@@ -15,8 +16,10 @@ public static partial class Inject
     public static TypeDescription BudgetBoyControlsTD { get; internal set; }
     public static TypeDescription HighscoreTD { get; internal set; }
     public static TypeDescription ButtonTD { get; internal set; }
+    public static TypeDescription GameStageTD { get; internal set; }
     public static TypeDescription TitleStageTD { get; internal set; }
     public static TypeDescription MainTD { get; internal set; }
+    public static TypeDescription BlockTD { get; internal set; }
 
     public static Entity Cabinet { get; internal set; }
     public static object Game { get; internal set; }
@@ -41,8 +44,10 @@ public static partial class Inject
         BudgetBoyFirmwareTD = TypeLibrary.GetType("GameAPI.BudgetBoy.Firmware");
         BudgetBoyControlsTD = TypeLibrary.GetType("GameAPI.BudgetBoy.Controls");
 
+        GameStageTD = TypeLibrary.GetType("Games.BlockParty.GameStage");
         TitleStageTD = TypeLibrary.GetType("Games.BlockParty.TitleStage");
         MainTD = TypeLibrary.GetType("Games.BlockParty.Main");
+        BlockTD = TypeLibrary.GetType("Games.BlockParty.Block");
 
         #endregion
 
@@ -113,16 +118,27 @@ public static partial class Inject
                 {
                     if (IsButtonJustPressed(GameControlsAButton))
                     {
-                        var TitleStageSelectedOptionField = TitleStageTD.GetProperty("_selectedOption");
-                        var _selectedOption = (int)TitleStageSelectedOptionField.GetValue(CurrentStage);
-                        Log.Info($"{_selectedOption}");
+                        // TODO: can't get any private property!
+                        //var TitleStageSelectedOptionField = TitleStageTD.GetProperty("_selectedOption");
+                        //foreach (var prop in )
+                        //    Log.Info($"{prop.Name}");
+                        Log.Info($"{TitleStageTD.GetProperty("_selectedOption")}");
+                        try
+                        {
+                            //var _selectedOption = TitleStageSelectedOptionField.GetValue(CurrentStage);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error($"{ex}");
+                        }
+                        //Log.Info($"{_selectedOption}");
                     }
                 }
             }
         };
 
-        if (stageTick.ContainsKey(CurrentStageType))
-            stageTick[CurrentStageType]();
+        if (stageTick.TryGetValue(CurrentStageType, out var value))
+            value();
     }
 
     [ConCmd.Client("add_highscore")]
@@ -135,9 +151,23 @@ public static partial class Inject
         var AddHighscore = BudgetBoyFirmwareTD.GetMethod("AddHighscore");
 
         var newHighscore = HighscoreTD.Create<object>(new object[] { nickname, score });
-        Log.Info($"{newHighscore}");
 
         AddHighscore.Invoke(Firmware, new object[] { newHighscore });
+    }
+
+    [ConCmd.Client("next_phase")]
+    public static void NextPhase()
+    {
+        var CurrentStage = GetCurrentStage();
+        if (CurrentStage.GetType() != GameStageTD.TargetType)
+            return;
+
+        var BlockNextLevelMethod = BlockTD.GetMethod("NextPhase");
+        
+        var GetBlocksMethod = GameStageTD.GetMethod("GetBlocks");
+        var Blocks = GetBlocksMethod.InvokeWithReturn<System.Collections.IList>(CurrentStage);
+        foreach (var block in Blocks)
+            BlockNextLevelMethod.Invoke(block, new object[] {});
     }
 
     [ConCmd.Client("uninitialize")]
