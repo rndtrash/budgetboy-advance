@@ -1,0 +1,29 @@
+{
+  "Title": "BudgetBoy Advance",
+  "Type": "addon",
+  "Org": "tesa",
+  "Ident": "bba",
+  "Tags": "",
+  "Schema": 1,
+  "HasAssets": true,
+  "AssetsPath": "",
+  "ResourcePaths": null,
+  "HasCode": true,
+  "CodePath": "/code/",
+  "Metadata": {
+    "ParentPackage": "layla.arcade",
+    "Compiler": {
+      "RootNamespace": "BBA",
+      "DefineConstants": "SANDBOX;ADDON;DEBUG",
+      "NoWarn": "1701;1702;1591;"
+    },
+    "PrimaryAsset": "",
+    "PhysicsMins": "-1,-1,-1",
+    "PhysicsMaxs": "1,1,1",
+    "RenderMins": "-1,-1,-1",
+    "RenderMaxs": "-1,-1,-1",
+    "Summary": "",
+    "Description": "",
+    "Public": false
+  }
+}
